@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bellwether — Commercial Real Estate Advisory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #F4F3F1;
+      --canvas-2: #EAE9E6;
+      --ink: #0A0A0A;
+      --ink-2: #18181B;
+      --muted: #5C5C5F;
+      --hairline: rgba(10,10,10,0.08);
+      --hairline-strong: rgba(10,10,10,0.12);
+      --innerlight: rgba(255,255,255,0.65);
+      --accent: #1F4D3F;
+      --accent-glow: #5A8C7A;
+      --accent-warm: #8B6F4E;
+      --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --ease: cubic-bezier(0.32, 0.72, 0, 1);
+      --ease-spring: cubic-bezier(0.16, 1.16, 0.3, 1);
+      --shell-radius: 2.25rem;
+      --core-radius: calc(2.25rem - 0.4rem);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; scroll-behavior: smooth; }
+    body {
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.5;
+      letter-spacing: -0.005em;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+
+    /* ============ AMBIENT MESH ============ */
+    .mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .mesh::before, .mesh::after {
+      content: ''; position: absolute; border-radius: 50%; filter: blur(90px);
+      opacity: 0.16; will-change: transform;
+    }
+    .mesh::before {
+      width: 720px; height: 720px;
+      background: radial-gradient(circle at 30% 30%, var(--accent-glow), transparent 60%);
+      top: -180px; left: -160px;
+      animation: drift1 28s var(--ease) infinite alternate;
+    }
+    .mesh::after {
+      width: 560px; height: 560px;
+      background: radial-gradient(circle at 60% 60%, #C9B79A, transparent 60%);
+      top: 120px; right: -140px;
+      animation: drift2 36s var(--ease) infinite alternate;
+    }
+    @keyframes drift1 { from { transform: translate3d(0,0,0); } to { transform: translate3d(80px, 60px, 0); } }
+    @keyframes drift2 { from { transform: translate3d(0,0,0); } to { transform: translate3d(-60px, 40px, 0); } }
+    @media (prefers-reduced-motion: reduce) { .mesh::before, .mesh::after { animation: none; } }
+
+    main, header, footer { position: relative; z-index: 1; }
+
+    /* ============ FLOATING PILL NAV ============ */
+    .nav-shell {
+      position: sticky; top: 24px; z-index: 50;
+      margin: 24px auto 0;
+      padding: 6px;
+      width: max-content; max-width: calc(100% - 56px);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.42);
+      backdrop-filter: saturate(160%) blur(22px);
+      -webkit-backdrop-filter: saturate(160%) blur(22px);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.45) inset,
+        0 0 0 1px rgba(10,10,10,0.05),
+        0 12px 36px -18px rgba(10,10,10,0.18);
+    }
+    .nav {
+      display: flex; align-items: center; gap: 18px;
+      padding: 6px 8px 6px 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .nav .brand { font-weight: 700; font-size: 16px; letter-spacing: -0.02em; display: inline-flex; align-items: center; gap: 8px; }
+    .nav .brand-mark {
+      width: 22px; height: 22px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-glow) 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 1px 2px rgba(10,10,10,0.18);
+    }
+    .nav ul { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; }
+    .nav ul a {
+      display: inline-block; padding: 9px 14px; border-radius: 999px;
+      color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: background 300ms var(--ease);
+    }
+    .nav ul a:hover { background: rgba(10,10,10,0.05); }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 7px 7px 16px;
+      border-radius: 999px;
+      background: var(--ink); color: var(--canvas);
+      font: 600 13px/1 var(--sans); cursor: pointer; border: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+      transition: transform 300ms var(--ease);
+    }
+    .pill .icon-wrap {
+      width: 26px; height: 26px; border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: transform 360ms var(--ease-spring), background 300ms var(--ease);
+    }
+    .pill:hover .icon-wrap { transform: translate(2px, -1px) scale(1.06); background: rgba(255,255,255,0.22); }
+    .pill:active { transform: scale(0.98); }
+    .pill svg { width: 12px; height: 12px; stroke: currentColor; fill: none; }
+
+    /* ============ HERO ============ */
+    .hero {
+      min-height: 100dvh;
+      padding: 96px 0 120px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px;
+      background: rgba(255,255,255,0.6);
+      box-shadow: inset 0 0 0 1px var(--hairline);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 4px rgba(31,77,63,0.18); }
+    .hero h1 {
+      font-size: clamp(44px, 6.5vw, 84px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.038em;
+      margin: 22px 0 28px;
+      max-width: 16ch;
+    }
+    .hero h1 .soft { color: var(--muted); font-weight: 500; }
+    .hero p.lede {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 52ch;
+      margin: 0 0 34px;
+      line-height: 1.55;
+    }
+    .hero .actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 18px; border-radius: 999px;
+      background: rgba(255,255,255,0.5);
+      box-shadow: inset 0 0 0 1px var(--hairline-strong);
+      font: 500 13.5px/1 var(--sans); color: var(--ink); cursor: pointer; border: none;
+      transition: background 300ms var(--ease), transform 300ms var(--ease);
+    }
+    .ghost:hover { background: rgba(255,255,255,0.85); }
+    .ghost:active { transform: scale(0.98); }
+
+    /* ============ HERO PREVIEW ============ */
+    .hero-preview {
+      position: relative;
+      padding: 10px;
+      border-radius: var(--shell-radius);
+      background: rgba(255,255,255,0.45);
+      box-shadow:
+        inset 0 1px 0 var(--innerlight),
+        0 0 0 1px var(--hairline),
+        0 30px 60px -28px rgba(10,10,10,0.22),
+        0 12px 24px -16px rgba(10,10,10,0.10);
+    }
+    .hero-preview .core {
+      position: relative;
+      border-radius: var(--core-radius);
+      background: linear-gradient(180deg, #FAFAF7 0%, #EFEFEB 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), inset 0 0 0 1px var(--hairline);
+      padding: 22px;
+      overflow: hidden;
+    }
+    .preview-bar { display: flex; gap: 6px; margin-bottom: 18px; }
+    .preview-bar span { width: 10px; height: 10px; border-radius: 999px; background: rgba(10,10,10,0.10); }
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pv-cell {
+      border-radius: 16px;
+      background: rgba(255,255,255,0.8);
+      box-shadow: inset 0 0 0 1px var(--hairline), inset 0 1px 0 rgba(255,255,255,0.8);
+      padding: 14px;
+    }
+    .pv-cell.span2 { grid-column: span 2; }
+    .pv-cell h4 { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
+    .pv-cell p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+    .pv-cell .meta { font-family: var(--mono); font-size: 9.5px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
+    .pv-cell .num { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-top: 4px; }
+    .pv-cell .num small { font-size: 12px; color: var(--muted); margin-left: 4px; font-weight: 500; }
+    .ring {
+      width: 38px; height: 38px; border-radius: 999px;
+      background: conic-gradient(var(--accent) 0 72%, rgba(10,10,10,0.08) 72% 100%);
+      mask: radial-gradient(circle 14px, transparent 12px, black 13px);
+      -webkit-mask: radial-gradient(circle 14px, transparent 12px, black 13px);
+      margin-top: 6px;
+    }
+    .pv-cell .row { display: flex; align-items: center; gap: 10px; }
+    .pulse {
+      width: 8px; height: 8px; border-radius: 999px; background: var(--accent);
+      box-shadow: 0 0 0 0 rgba(31,77,63,0.4);
+      animation: pulse 2.4s var(--ease) infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(31,77,63,0.4); }
+      70%  { box-shadow: 0 0 0 10px rgba(31,77,63,0); }
+      100% { box-shadow: 0 0 0 0 rgba(31,77,63,0); }
+    }
+
+    /* ============ SECTION DEFAULTS ============ */
+    section.block { padding: 112px 0; position: relative; }
+    .section-head { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end; margin-bottom: 56px; }
+    .section-head h2 {
+      font-size: clamp(38px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1;
+      margin: 16px 0 0;
+      max-width: 16ch;
+    }
+    .section-head p { color: var(--muted); font-size: 16.5px; max-width: 46ch; margin: 0; line-height: 1.55; }
+
+    /* ============ BENTO ============ */
+    .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+    .b-card {
+      padding: 8px;
+      border-radius: var(--shell-radius);
+      background: rgba(255,255,255,0.5);
+      box-shadow:
+        inset 0 1px 0 var(--innerlight),
+        0 0 0 1px var(--hairline),
+        0 24px 48px -28px rgba(10,10,10,0.18);
+      transition: transform 600ms var(--ease), box-shadow 600ms var(--ease);
+    }
+    .b-card:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        inset 0 1px 0 var(--innerlight),
+        0 0 0 1px var(--hairline),
+        0 30px 70px -22px rgba(10,10,10,0.22);
+    }
+    .b-card .core {
+      border-radius: var(--core-radius);
+      background: #FCFCFA;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), inset 0 0 0 1px var(--hairline);
+      padding: 32px;
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+    .b-card.dark .core {
+      background: linear-gradient(180deg, #1A1A1A 0%, #0F0F0F 100%);
+      color: #ECECEA;
+    }
+    .b-card.dark .core .meta { color: rgba(255,255,255,0.55); }
+    .b-card.dark .core p { color: rgba(255,255,255,0.6); }
+    .b-card .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+    .b-card h3 { font-size: 24px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; margin: 0 0 10px; }
+    .b-card.dark h3 { color: #FFFFFF; }
+    .b-card p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.55; max-width: 36ch; }
+
+    .span-3 { grid-column: span 3; }
+    .span-2 { grid-column: span 2; }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .row-2 { grid-row: span 2; }
+
+    .stat { display: flex; align-items: baseline; gap: 8px; margin-top: 24px; }
+    .stat .big { font-size: 56px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+    .stat .unit { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+
+    /* ============ MARQUEE ============ */
+    .marquee {
+      padding: 56px 0;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+    }
+    .marquee-track {
+      display: flex; gap: 64px; width: max-content;
+      animation: track 40s linear infinite;
+      will-change: transform;
+    }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes track { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-item {
+      font-weight: 700; font-size: 22px; letter-spacing: -0.02em; color: var(--ink);
+      opacity: 0.55;
+      white-space: nowrap;
+    }
+    .marquee-item em { font-style: normal; color: var(--muted); margin: 0 12px; }
+
+    /* ============ TEAM ============ */
+    .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .team-card {
+      padding: 8px;
+      border-radius: var(--shell-radius);
+      background: rgba(255,255,255,0.5);
+      box-shadow:
+        inset 0 1px 0 var(--innerlight),
+        0 0 0 1px var(--hairline),
+        0 24px 48px -28px rgba(10,10,10,0.18);
+      transition: transform 600ms var(--ease), box-shadow 600ms var(--ease);
+    }
+    .team-card:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        inset 0 1px 0 var(--innerlight),
+        0 0 0 1px var(--hairline),
+        0 30px 70px -22px rgba(10,10,10,0.22);
+    }
+    .team-card .core {
+      border-radius: var(--core-radius);
+      background: #FCFCFA;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), inset 0 0 0 1px var(--hairline);
+      padding: 28px;
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+    .team-card .avatar {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--canvas-2), var(--canvas));
+      box-shadow: inset 0 0 0 1px var(--hairline);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px; color: var(--accent);
+      margin-bottom: 18px;
+    }
+    .team-card h4 { font-size: 16px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.02em; }
+    .team-card .role { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .team-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+    /* ============ OFFICES ============ */
+    .offices { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .office {
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.5);
+      box-shadow: inset 0 1px 0 var(--innerlight), 0 0 0 1px var(--hairline);
+      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
+    }
+    .office:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 var(--innerlight), 0 0 0 1px var(--hairline), 0 12px 24px -12px rgba(10,10,10,0.12); }
+    .office h4 { font-size: 14px; font-weight: 700; margin: 0 0 6px; }
+    .office p { font-size: 12.5px; color: var(--muted); margin: 0; line-height: 1.5; }
+    .office .tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+
+    /* ============ CLOSING ============ */
+    .closing {
+      padding: 112px 0;
+      margin: 56px 28px 28px;
+      border-radius: 40px;
+      background: linear-gradient(180deg, #131313 0%, #050505 100%);
+      color: #F2F2F0;
+      position: relative; overflow: hidden;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 30px 80px -40px rgba(10,10,10,0.6);
+    }
+    .closing::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(700px 360px at 30% 0%, rgba(90,140,122,0.32), transparent 70%);
+      pointer-events: none;
+    }
+    .closing-inner { position: relative; max-width: 1040px; padding: 0 32px; margin: 0 auto; text-align: center; }
+    .closing h2 { font-size: clamp(40px, 5.5vw, 76px); font-weight: 700; letter-spacing: -0.035em; line-height: 1; margin: 0 0 18px; max-width: 18ch; margin-inline: auto; }
+    .closing p { color: rgba(242,242,240,0.65); font-size: 17px; margin: 0 auto 32px; max-width: 48ch; line-height: 1.55; }
+    .closing .pill { background: var(--canvas); color: var(--ink); }
+    .closing .pill .icon-wrap { background: rgba(10,10,10,0.08); }
+
+    /* ============ FOOTER ============ */
+    footer {
+      padding: 36px 28px 28px;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    footer .row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--ink); }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; padding-top: 64px; padding-bottom: 80px; }
+      .nav ul { display: none; }
+      .section-head { grid-template-columns: 1fr; gap: 18px; }
+      .bento { grid-template-columns: 1fr; }
+      .span-3, .span-2, .span-4, .span-6 { grid-column: span 1; }
+      .row-2 { grid-row: auto; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .offices { grid-template-columns: 1fr 1fr; }
+      .closing { margin: 28px 16px; padding: 80px 0; }
+    }
+    @media (max-width: 520px) {
+      .team-grid { grid-template-columns: 1fr; }
+      .offices { grid-template-columns: 1fr; }
+    }
+
+    /* ============ MOTION ============ */
+    .reveal { opacity: 0; transform: translateY(18px); filter: blur(6px); transition: opacity 800ms var(--ease), transform 800ms var(--ease), filter 800ms var(--ease); }
+    .reveal.is-in { opacity: 1; transform: none; filter: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; filter: none; transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+
+  <div class="nav-shell">
+    <header class="nav">
+      <span class="brand"><span class="brand-mark"></span>Bellwether</span>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="pill" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+        <span>Get in touch</span>
+        <span class="icon-wrap"><svg viewBox="0 0 12 12" stroke-width="1.6"><path d="M2.5 6h7M6 2.5L9.5 6 6 9.5"/></svg></span>
+      </button>
+    </header>
+  </div>
+
+  <main>
+    <!-- HERO -->
+    <section class="wrap hero reveal">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span>Est. 2013 · Institutional Advisory</span>
+        <h1>Strategic Advisory. <span class="soft">Real Results.</span></h1>
+        <p class="lede">Bellwether is a commercial real estate advisory firm that partners with institutional investors, lenders, and owners to maximize value across every stage of the investment lifecycle.</p>
+        <div class="actions">
+          <button class="pill" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
+            <span>Explore services</span>
+            <span class="icon-wrap"><svg viewBox="0 0 12 12" stroke-width="1.6"><path d="M2.5 6h7M6 2.5L9.5 6 6 9.5"/></svg></span>
+          </button>
+          <button class="ghost" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+            Learn about us
+          </button>
+        </div>
+      </div>
+
+      <aside class="hero-preview">
+        <div class="core">
+          <div class="preview-bar"><span></span><span></span><span></span></div>
+          <div class="preview-grid">
+            <div class="pv-cell span2">
+              <div class="meta">portfolio · live</div>
+              <div class="row" style="justify-content: space-between;">
+                <div>
+                  <h4 style="font-size: 14px;">Multifamily Equity / US West</h4>
+                  <div class="row" style="margin-top: 4px;"><span class="pulse"></span><p style="margin:0; font-size: 11px;">Active · 33,000+ units managed</p></div>
+                </div>
+                <div class="ring" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div class="pv-cell">
+              <div class="meta">aum advised</div>
+              <div class="num">$50B+<small>USD</small></div>
+            </div>
+            <div class="pv-cell">
+              <div class="meta">offices</div>
+              <div class="num">5<small>global</small></div>
+            </div>
+            <div class="pv-cell span2">
+              <div class="meta">latest transaction</div>
+              <p style="font-size: 11.5px; line-height: 1.6;">
+                <code style="font-family: var(--mono); color: var(--accent);">Q2 2026</code> · Portfolio restructuring for <b>institutional client</b> across office and industrial assets. Advisory on <b>$1.2B</b> in repositioned capital.
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- MARQUEE -->
+    <section class="marquee reveal">
+      <div class="marquee-track">
+        <span class="marquee-item">Asset Management<em>·</em>Portfolio Oversight<em>·</em>Corporate Advisory<em>·</em>Capital Markets<em>·</em>Construction Management<em>·</em>Underwriting<em>·</em>Due Diligence<em>·</em>Restructuring<em>·</em></span>
+        <span class="marquee-item" aria-hidden="true">Asset Management<em>·</em>Portfolio Oversight<em>·</em>Corporate Advisory<em>·</em>Capital Markets<em>·</em>Construction Management<em>·</em>Underwriting<em>·</em>Due Diligence<em>·</em>Restructuring<em>·</em></span>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="block reveal" id="about">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow"><span class="dot"></span>01 · about</span>
+          <p>Founded in 2013, Bellwether serves institutional clients across the United States and Europe with a comprehensive suite of advisory services.</p>
+        </div>
+        <div class="section-head" style="margin-bottom: 56px;">
+          <h2>We are an extension of your team — embedded, accountable, and focused on delivering <em style="font-weight:500; color: var(--muted); font-style: normal;">measurable results.</em></h2>
+          <span></span>
+        </div>
+
+        <div class="bento">
+          <div class="b-card span-3 row-2">
+            <div class="core">
+              <div class="meta">01 · heritage</div>
+              <h3>Built by operators, not theorists.</h3>
+              <p>Our Principals and Managing Directors bring decades of combined experience from J.P. Morgan, Goldman Sachs, EY-Parthenon, McKinsey, Credit Suisse, and leading real estate investment managers. We have managed and advised on billions in debt and equity across all major property types.</p>
+              <div class="stat"><span class="big">2013</span><span class="unit">founded</span></div>
+            </div>
+          </div>
+          <div class="b-card span-3">
+            <div class="core">
+              <div class="meta">02 · scale</div>
+              <h3>Institutional-grade coverage.</h3>
+              <p>Five offices across the US and Europe provide seamless coverage for complex, multi-jurisdictional portfolios and transactions.</p>
+              <div class="stat"><span class="big">5</span><span class="unit">offices</span></div>
+            </div>
+          </div>
+          <div class="b-card span-3 dark">
+            <div class="core">
+              <div class="meta">03 · discipline</div>
+              <h3>Discipline in every decision.</h3>
+              <p>We combine deep market expertise with rigorous financial analysis and disciplined execution. Every recommendation is backed by data, tested against downside scenarios, and aligned with your strategic objectives.</p>
+            </div>
+          </div>
+          <div class="b-card span-2">
+            <div class="core">
+              <div class="meta">04 · debt</div>
+              <h3>Debt Asset Management.</h3>
+              <p>Performing and non-performing loan oversight, workout strategy, and special servicing for institutional lenders.</p>
+            </div>
+          </div>
+          <div class="b-card span-2">
+            <div class="core">
+              <div class="meta">05 · equity</div>
+              <h3>Equity Portfolio Management.</h3>
+              <p>End-to-end asset management across multifamily, office, industrial, and hospitality investments.</p>
+            </div>
+          </div>
+          <div class="b-card span-2">
+            <div class="core">
+              <div class="meta">06 · advisory</div>
+              <h3>Corporate & Transaction Advisory.</h3>
+              <p>M&A, restructuring, transformation, and capital solutions for real estate sponsors and institutional investors.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="block reveal" id="services" style="padding-top: 0;">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow"><span class="dot"></span>02 · services</span>
+          <p>A single-source solution combining specialized expertise with a unified approach to value creation.</p>
+        </div>
+        <div class="section-head" style="margin-bottom: 56px;">
+          <h2>Comprehensive advisory across the entire <em style="font-weight:500; color: var(--muted); font-style: normal;">investment lifecycle.</em></h2>
+          <span></span>
+        </div>
+
+        <div class="bento">
+          <div class="b-card span-3">
+            <div class="core">
+              <div class="meta">01 · asset management</div>
+              <h3>Asset Management</h3>
+              <p>Comprehensive oversight of debt and equity investments across all major asset classes. We monitor performance, mitigate risk, and identify opportunities to enhance returns.</p>
+            </div>
+          </div>
+          <div class="b-card span-3">
+            <div class="core">
+              <div class="meta">02 · portfolio</div>
+              <h3>Portfolio Management</h3>
+              <p>Strategic management of multi-asset portfolios for institutional clients, including reporting, analytics, and proactive decision support.</p>
+            </div>
+          </div>
+          <div class="b-card span-3 dark">
+            <div class="core">
+              <div class="meta">03 · corporate</div>
+              <h3>Corporate Advisory</h3>
+              <p>Expert guidance on mergers, acquisitions, restructurings, and large-scale transformations. We serve as trusted advisors through complex transactions and operational turnarounds.</p>
+            </div>
+          </div>
+          <div class="b-card span-3">
+            <div class="core">
+              <div class="meta">04 · capital markets</div>
+              <h3>Capital Markets & Advisory</h3>
+              <p>Capital raising, deal structuring, and advisory services for real estate sponsors and institutional investors seeking optimal financing solutions.</p>
+            </div>
+          </div>
+          <div class="b-card span-3">
+            <div class="core">
+              <div class="meta">05 · construction</div>
+              <h3>Construction Management</h3>
+              <p>End-to-end oversight of development and construction projects, ensuring timely delivery, cost control, and quality execution.</p>
+            </div>
+          </div>
+          <div class="b-card span-3">
+            <div class="core">
+              <div class="meta">06 · underwriting</div>
+              <h3>Underwriting & Due Diligence</h3>
+              <p>Rigorous analysis of investment opportunities, including valuation, risk assessment, and transaction structuring.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+    <section class="block reveal" id="team">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow"><span class="dot"></span>03 · leadership</span>
+          <p>Our senior team brings together deep expertise across real estate investment, finance, asset management, and corporate advisory.</p>
+        </div>
+        <div class="section-head" style="margin-bottom: 56px;">
+          <h2>Leadership with <em style="font-weight:500; color: var(--muted); font-style: normal;">institutional pedigree.</em></h2>
+          <span></span>
+        </div>
+
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">DG</div>
+              <h4>Dennis Grzeskowiak</h4>
+              <div class="role">Co-Founder & Principal</div>
+              <p>20 years in asset management and special servicing. Former VP at Trimont Real Estate Advisors overseeing $2B portfolio.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">JM</div>
+              <h4>Joseph Mossotti</h4>
+              <div class="role">Co-Founder & Principal</div>
+              <p>18 years in private equity asset management and institutional corporate finance. Former JER Partners and licensed CPA.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">MB</div>
+              <h4>Michael Baracco</h4>
+              <div class="role">Principal</div>
+              <p>Former Senior Project Engineer at Lockheed Martin. MBA from University of Denver. Focus on office and hospitality.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">DC</div>
+              <h4>David Chalison</h4>
+              <div class="role">Principal</div>
+              <p>10+ years in corporate FP&A. Former Director at Chronos Solutions. Leads portfolio management for equity and debt clients.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">JA</div>
+              <h4>Jigar Astik</h4>
+              <div class="role">Managing Director</div>
+              <p>Former EY-Parthenon and founding member of McKinsey's Recovery and Transformation Practice. Global Head of Corporate Advisory.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">GF</div>
+              <h4>Greg Fink</h4>
+              <div class="role">Managing Director</div>
+              <p>25+ years in institutional finance and real estate. Former Head of Capital Markets at Champion Real Estate. MBA from UCLA Anderson.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">MN</div>
+              <h4>Michael Nagin</h4>
+              <div class="role">Managing Director</div>
+              <p>25+ years as lender and equity investor. Former Executive Director at J.P. Morgan Real Estate Bank. $5B+ in closed investments.</p>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="core">
+              <div class="avatar">BE</div>
+              <h4>Ben Easton</h4>
+              <div class="role">Managing Director</div>
+              <p>Leads Bellwether's London office and European portfolio. Former NMS Properties and Mesa West Capital.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OFFICES -->
+    <section class="block reveal" style="padding-top: 0;">
+      <div class="wrap">
+        <div class="section-head" style="margin-bottom: 40px;">
+          <span class="eyebrow"><span class="dot"></span>04 · offices</span>
+          <p></p>
+        </div>
+        <div class="offices">
+          <div class="office">
+            <div class="tag">Headquarters</div>
+            <h4>Los Angeles</h4>
+            <p>200 N Pacific Coast Highway<br>14th Floor, El Segundo, CA 90245<br>(310) 525-3022</p>
+          </div>
+          <div class="office">
+            <div class="tag">US Central</div>
+            <h4>Dallas</h4>
+            <p>1717 McKinney Avenue<br>Suite 1200, Dallas, TX 75201<br>(469) 677-0677</p>
+          </div>
+          <div class="office">
+            <div class="tag">US West</div>
+            <h4>Newport Beach</h4>
+            <p>660 Newport Center Drive<br>Suite 400, Newport Beach, CA 92660</p>
+          </div>
+          <div class="office">
+            <div class="tag">US Mountain</div>
+            <h4>Salt Lake City</h4>
+            <p>460 West 50 North, Suite 500<br>Salt Lake City, UT 84101<br>(801) 630-3202</p>
+          </div>
+          <div class="office">
+            <div class="tag">EMEA</div>
+            <h4>London</h4>
+            <p>10 Bressenden Place<br>5th Floor, London SW1E 5DH<br>+44 20 8090 6000</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING / CONTACT -->
+    <section class="closing reveal" id="contact">
+      <div class="closing-inner">
+        <h2>Your partner in maximizing real estate value.</h2>
+        <p>Whether you are seeking asset management support, portfolio oversight, or strategic advisory services, we welcome the opportunity to discuss how Bellwether can support your objectives.</p>
+        <button class="pill" onclick="alert('Contact form would open here. Email: info@bellwetherco.com')">
+          <span>Talk to our team</span>
+          <span class="icon-wrap"><svg viewBox="0 0 12 12" stroke-width="1.6"><path d="M2.5 6h7M6 2.5L9.5 6 6 9.5"/></svg></span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="row">
+      <span>Bellwether Commercial Real Estate Advisory · Est. 2013</span>
+      <span><a href="#about">About</a> · <a href="#services">Services</a> · <a href="#team">Team</a> · <a href="#contact">Contact</a> · <a href="#">Privacy</a></span>
+    </div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      }
+    }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>
