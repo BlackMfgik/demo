@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="en">
   <head>
@@ -9,4 +10,615 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Son:mi — AI Beauty Advisor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        cream: '#FAF8F5',
+                        sand: '#F0EBE3',
+                        camel: '#D4A574',
+                        ink: '#1A1A2E',
+                        navy: '#16213E',
+                        warm: '#E8D5C4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { scroll-behavior: smooth; }
+        body { background: #FAF8F5; }
+
+        .grain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9999; opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .hero-text {
+            font-size: clamp(3rem, 8vw, 7rem);
+            line-height: 0.95;
+            letter-spacing: -0.03em;
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .marquee {
+            display: flex; overflow: hidden; white-space: nowrap;
+        }
+        .marquee-content {
+            display: flex; animation: marquee 30s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .skin-tone-dot {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .skin-tone-dot:hover {
+            transform: scale(1.3);
+        }
+
+        .product-card {
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px -12px rgba(26,26,46,0.15);
+        }
+
+        .scan-line {
+            position: absolute; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #D4A574, transparent);
+            animation: scan 3s ease-in-out infinite;
+        }
+        @keyframes scan {
+            0%, 100% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .reveal {
+            opacity: 0; transform: translateY(40px);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: -2px; left: 0;
+            width: 0; height: 1px; background: #1A1A2E;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .btn-magnetic {
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FAF8F5; }
+        ::-webkit-scrollbar-thumb { background: #D4A574; border-radius: 3px; }
+    </style>
+<base target="_blank">
+</head>
+<body class="font-sans text-ink antialiased">
+    <div class="grain"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-500" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="#" class="text-2xl font-serif font-semibold tracking-tight">Son:mi</a>
+            <div class="hidden md:flex items-center gap-10 text-sm font-medium">
+                <a href="#how" class="nav-link">How it works</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#journal" class="nav-link">Skin Journal</a>
+                <a href="#products" class="nav-link">Products</a>
+            </div>
+            <button class="btn-magnetic bg-ink text-cream px-6 py-2.5 rounded-full text-sm font-medium hover:bg-navy transition-colors">
+                Start Analysis
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center overflow-hidden pt-20">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-20 right-0 w-[600px] h-[600px] bg-gradient-to-br from-warm/40 to-camel/20 rounded-full blur-3xl float-anim"></div>
+            <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-sand/60 to-transparent rounded-full blur-2xl"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur rounded-full border border-warm/50 text-xs font-medium tracking-wide uppercase text-ink/70">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    AI-Powered Skin Analysis
+                </div>
+
+                <h1 class="hero-text font-serif text-ink">
+                    Your skin,<br>
+                    <span class="italic text-camel">decoded.</span>
+                </h1>
+
+                <p class="text-lg text-ink/60 max-w-md leading-relaxed">
+                    Upload a selfie. Get your perfect foundation shade across 500+ brands. 
+                    Personalised skincare recommendations powered by computer vision.
+                </p>
+
+                <div class="flex flex-wrap gap-4">
+                    <button class="btn-magnetic bg-ink text-cream px-8 py-4 rounded-full font-medium hover:bg-navy transition-all flex items-center gap-2 group">
+                        Start Free Analysis
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </button>
+                    <button class="px-8 py-4 rounded-full font-medium border border-ink/20 hover:border-ink/40 transition-all">
+                        See how it works
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-6 pt-4 text-sm text-ink/50">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-warm border-2 border-cream"></div>
+                        <div class="w-8 h-8 rounded-full bg-camel/60 border-2 border-cream"></div>
+                        <div class="w-8 h-8 rounded-full bg-navy/40 border-2 border-cream"></div>
+                    </div>
+                    <span>Trusted by 50,000+ users</span>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="relative bg-white rounded-[2.5rem] shadow-2xl shadow-ink/5 p-6 border border-warm/30 float-anim" style="animation-delay: -2s;">
+                    <div class="absolute -top-3 -right-3 bg-cream border border-warm/50 rounded-2xl px-4 py-2 shadow-lg">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="text-xs font-semibold">Analysis Complete</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-sand/50 to-cream rounded-2xl p-6 mb-4 relative overflow-hidden">
+                        <div class="scan-line"></div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-camel/30 to-warm flex items-center justify-center text-2xl">📸</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Facial Analysis</h3>
+                                <p class="text-sm text-ink/50 mt-1">AI-powered assessment</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-medium flex items-center gap-2">🔥 Skin Tone</span>
+                                <span class="text-xs bg-warm/50 px-2 py-1 rounded-full">Medium · Warm</span>
+                            </div>
+                            <p class="text-xs text-ink/60 leading-relaxed">Medium skin tone with warm-olive undertones. The complexion reads more golden/green than pink.</p>
+                        </div>
+
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium">Skin Type</span>
+                                <span class="text-xs bg-warm/50 px-2 py-1 rounded-full">Normal · 82%</span>
+                            </div>
+                            <div class="w-full bg-sand rounded-full h-1.5 mt-2">
+                                <div class="bg-gradient-to-r from-camel to-ink h-1.5 rounded-full" style="width: 82%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-4 border border-warm/20 float-anim" style="animation-delay: -4s;">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-sm font-bold">86%</div>
+                        <div>
+                            <p class="text-xs font-semibold">Match Score</p>
+                            <p class="text-[10px] text-ink/50">Excellent compatibility</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skin Tone Spectrum -->
+    <section class="py-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 mb-12">
+            <p class="text-sm font-medium text-camel uppercase tracking-widest mb-4 reveal">Inclusive by Design</p>
+            <h2 class="text-4xl md:text-5xl font-serif reveal">Works on every skin tone.<br>Every undertone.</h2>
+        </div>
+
+        <div class="relative">
+            <div class="marquee py-8">
+                <div class="marquee-content gap-6">
+                    <div class="flex gap-6 px-3">
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#F5E6D3] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#E8D4C4] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#D4A574] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#C8956C] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#A67B5B] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#8D5524] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#6F4E37] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#4A3728] shadow-lg cursor-pointer"></div>
+                    </div>
+                    <div class="flex gap-6 px-3">
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#F5E6D3] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#E8D4C4] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#D4A574] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#C8956C] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#A67B5B] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#8D5524] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#6F4E37] shadow-lg cursor-pointer"></div>
+                        <div class="skin-tone-dot w-24 h-24 rounded-full bg-[#4A3728] shadow-lg cursor-pointer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 mt-12 flex flex-wrap gap-8 justify-center text-center reveal">
+            <div>
+                <p class="text-3xl font-serif font-semibold">500+</p>
+                <p class="text-sm text-ink/50 mt-1">Beauty Brands</p>
+            </div>
+            <div class="w-px bg-ink/10"></div>
+            <div>
+                <p class="text-3xl font-serif font-semibold">50K+</p>
+                <p class="text-sm text-ink/50 mt-1">Analyses Done</p>
+            </div>
+            <div class="w-px bg-ink/10"></div>
+            <div>
+                <p class="text-3xl font-serif font-semibold">98%</p>
+                <p class="text-sm text-ink/50 mt-1">Accuracy Rate</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <p class="text-sm font-medium text-camel uppercase tracking-widest mb-4 reveal">The Process</p>
+                <h2 class="text-4xl md:text-5xl font-serif reveal">How it works</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="group reveal">
+                    <div class="relative mb-6">
+                        <div class="aspect-[4/5] bg-gradient-to-br from-sand to-cream rounded-3xl overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-32 h-32 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
+                                    <span class="text-4xl">📱</span>
+                                </div>
+                            </div>
+                            <div class="absolute top-4 left-4 text-6xl font-serif text-ink/5 font-bold">01</div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Take a selfie</h3>
+                    <p class="text-ink/50 text-sm leading-relaxed">Snap a photo in natural light. Our AI reads your skin tone, undertone, and type in seconds.</p>
+                </div>
+
+                <div class="group reveal">
+                    <div class="relative mb-6">
+                        <div class="aspect-[4/5] bg-gradient-to-br from-warm/30 to-cream rounded-3xl overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-32 h-32 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
+                                    <span class="text-4xl">🔬</span>
+                                </div>
+                            </div>
+                            <div class="absolute top-4 left-4 text-6xl font-serif text-ink/5 font-bold">02</div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Get your analysis</h3>
+                    <p class="text-ink/50 text-sm leading-relaxed">Detailed breakdown cross-referenced against dermatological research with confidence scores.</p>
+                </div>
+
+                <div class="group reveal">
+                    <div class="relative mb-6">
+                        <div class="aspect-[4/5] bg-gradient-to-br from-camel/20 to-warm/20 rounded-3xl overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-32 h-32 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
+                                    <span class="text-4xl">✨</span>
+                                </div>
+                            </div>
+                            <div class="absolute top-4 left-4 text-6xl font-serif text-ink/5 font-bold">03</div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Discover matches</h3>
+                    <p class="text-ink/50 text-sm leading-relaxed">Receive personalised product recommendations across 500+ brands tailored to your unique profile.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="reveal">
+                    <p class="text-sm font-medium text-camel uppercase tracking-widest mb-4">Smart Features</p>
+                    <h2 class="text-4xl md:text-5xl font-serif mb-6">More than just<br>a shade match.</h2>
+                    <p class="text-ink/60 leading-relaxed mb-8">Son:mi learns how your skin changes with seasons, products, and habits — so recommendations get sharper over time.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4 items-start group cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-sand flex items-center justify-center text-xl group-hover:bg-camel/30 transition-colors shrink-0">📔</div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Skin Journal</h4>
+                                <p class="text-sm text-ink/50">Track progress with photos and notes over time.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start group cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-sand flex items-center justify-center text-xl group-hover:bg-camel/30 transition-colors shrink-0">📷</div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Product Scanner</h4>
+                                <p class="text-sm text-ink/50">Point your camera at any product for instant ingredient analysis.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start group cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-sand flex items-center justify-center text-xl group-hover:bg-camel/30 transition-colors shrink-0">🧠</div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Explainable AI</h4>
+                                <p class="text-sm text-ink/50">See exactly what Son:mi detected and why — with full transparency.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative reveal">
+                    <div class="bg-white rounded-[2rem] shadow-2xl shadow-ink/5 p-6 border border-warm/20">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-semibold text-lg">Product Analysis</h3>
+                                <p class="text-xs text-ink/50">AI-powered compatibility</p>
+                            </div>
+                            <span class="px-3 py-1 bg-warm/50 rounded-full text-xs font-medium">skincare</span>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl p-6 mb-6 relative overflow-hidden">
+                            <div class="relative z-10">
+                                <p class="font-semibold text-lg">Madagascar Centella<br>Tone Brightening</p>
+                                <p class="text-sm text-ink/50 mt-1">SKIN1004</p>
+                            </div>
+                            <div class="absolute right-4 top-4 w-20 h-20 bg-white/50 rounded-full blur-xl"></div>
+                        </div>
+
+                        <div class="bg-navy rounded-2xl p-6 text-white mb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-16 h-16">
+                                    <svg class="w-16 h-16 transform -rotate-90">
+                                        <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.1)" stroke-width="4" fill="none"/>
+                                        <circle cx="32" cy="32" r="28" stroke="#D4A574" stroke-width="4" fill="none" stroke-dasharray="175" stroke-dashoffset="25"/>
+                                    </svg>
+                                    <span class="absolute inset-0 flex items-center justify-center text-sm font-bold">86%</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Your Match Score</p>
+                                    <p class="text-xs text-white/60">Excellent compatibility</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-green-400 rounded-full"></span>Skin Type</span>
+                                <span class="px-3 py-1 border border-green-400/30 text-green-600 rounded-full text-xs">✓ Excellent</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-green-400 rounded-full"></span>Skin Tone</span>
+                                <span class="px-3 py-1 border border-green-400/30 text-green-600 rounded-full text-xs">✓ Good</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof / Journal -->
+    <section id="journal" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <p class="text-sm font-medium text-camel uppercase tracking-widest mb-4 reveal">Skin Journal</p>
+                <h2 class="text-4xl md:text-5xl font-serif reveal">Track your glow-up.</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="product-card bg-cream rounded-3xl overflow-hidden border border-warm/20 reveal">
+                    <div class="aspect-square bg-gradient-to-br from-sand to-warm/30 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-6xl opacity-30">👤</div>
+                        </div>
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-medium">Before</div>
+                        <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-medium">8/10</div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-ink/40 mb-1">May 23</p>
+                        <p class="font-medium">Week 1 Entry</p>
+                        <p class="text-sm text-ink/50 mt-2">Starting new routine with hyaluronic acid serum.</p>
+                    </div>
+                </div>
+
+                <div class="product-card bg-cream rounded-3xl overflow-hidden border border-warm/20 reveal">
+                    <div class="aspect-square bg-gradient-to-br from-warm/40 to-camel/20 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-6xl opacity-30">✨</div>
+                        </div>
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-medium">After</div>
+                        <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-medium">9/10</div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-ink/40 mb-1">May 25</p>
+                        <p class="font-medium">Week 2 Entry</p>
+                        <div class="mt-2 inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                            ↗ +1 since last
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card bg-navy rounded-3xl overflow-hidden text-white reveal">
+                    <div class="p-8 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-6">📈</div>
+                            <h3 class="text-2xl font-serif mb-2">See your progress</h3>
+                            <p class="text-white/60 text-sm leading-relaxed">Log entries with photos and notes. Watch your skin score improve over time.</p>
+                        </div>
+                        <button class="mt-8 w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors">
+                            Start Your Journal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-ink to-navy"></div>
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-camel/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-warm/10 rounded-full blur-3xl"></div>
+
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+            <h2 class="text-4xl md:text-6xl font-serif text-white mb-6 reveal">Ready to meet<br>your perfect match?</h2>
+            <p class="text-white/60 text-lg mb-10 max-w-xl mx-auto reveal">Join 50,000+ users who found their ideal shade and skincare routine with AI-powered analysis.</p>
+            <div class="flex flex-wrap justify-center gap-4 reveal">
+                <button class="bg-white text-ink px-10 py-4 rounded-full font-medium hover:bg-cream transition-colors flex items-center gap-2 group">
+                    Get Started Free
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </button>
+                <button class="border border-white/30 text-white px-10 py-4 rounded-full font-medium hover:bg-white/10 transition-colors">
+                    View Demo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-cream border-t border-warm/20 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 mb-16">
+                <div class="md:col-span-2">
+                    <h3 class="text-2xl font-serif font-semibold mb-4">Son:mi</h3>
+                    <p class="text-ink/50 max-w-sm leading-relaxed">AI-powered beauty advisor that analyses your skin and recommends products across 500+ brands. Personalised, precise, and private.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-ink/50">
+                        <li><a href="#" class="hover:text-ink transition-colors">Skin Analysis</a></li>
+                        <li><a href="#" class="hover:text-ink transition-colors">Shade Matching</a></li>
+                        <li><a href="#" class="hover:text-ink transition-colors">Product Scanner</a></li>
+                        <li><a href="#" class="hover:text-ink transition-colors">Skin Journal</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-3 text-sm text-ink/50">
+                        <li><a href="#" class="hover:text-ink transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-ink transition-colors">Privacy</a></li>
+                        <li><a href="#" class="hover:text-ink transition-colors">Terms</a></li>
+                        <li><a href="#" class="hover:text-ink transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-warm/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-ink/40">© 2026 Son:mi. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-ink/40 hover:text-ink transition-colors">Instagram</a>
+                    <a href="#" class="text-ink/40 hover:text-ink transition-colors">TikTok</a>
+                    <a href="#" class="text-ink/40 hover:text-ink transition-colors">Twitter</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-cream/90', 'backdrop-blur-lg', 'shadow-sm');
+            } else {
+                navbar.classList.remove('bg-cream/90', 'backdrop-blur-lg', 'shadow-sm');
+            }
+        });
+
+        // Reveal animations
+        gsap.utils.toArray('.reveal').forEach((elem, i) => {
+            gsap.to(elem, {
+                scrollTrigger: {
+                    trigger: elem,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power3.out',
+                delay: i * 0.1
+            });
+        });
+
+        // Magnetic buttons
+        document.querySelectorAll('.btn-magnetic').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+>>>>>>> 936178211845b2b281b0cef032328def7c0a8b70
 </html>
